@@ -1,0 +1,5 @@
+target/
+*.class
+*.jar
+.DS_Store
+spark.log
