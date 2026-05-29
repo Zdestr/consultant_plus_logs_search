@@ -126,7 +126,6 @@ object LogAnalysis {
     val docOpensPath = s"$deltaPath/doc_opens"
 
     try {
-      // Create Delta tables on the very first run
       if (!DeltaTable.isDeltaTable(spark, sessionsPath)) {
         spark.createDataFrame(sc.emptyRDD[Row], SessionSchema)
           .write.format("delta").save(sessionsPath)
@@ -136,7 +135,6 @@ object LogAnalysis {
           .write.format("delta").partitionBy("date").save(docOpensPath)
       }
 
-      // Collect already-processed paths so we can skip them
       import spark.implicits._
       val processedPaths = spark.read.format("delta").load(sessionsPath)
         .select("file_path").as[String].collect().toSet
@@ -176,7 +174,6 @@ object LogAnalysis {
         println("No new files — computing metrics from cached Delta data.")
       }
 
-      // Metrics from the full Delta tables (all runs combined)
       val sessionsDf = spark.read.format("delta").load(sessionsPath)
       val docOpensDf = spark.read.format("delta").load(docOpensPath)
 

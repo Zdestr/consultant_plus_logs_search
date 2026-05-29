@@ -15,12 +15,9 @@
     <scala.version>2.12.18</scala.version>
     <spark.version>3.5.3</spark.version>
     <delta.version>3.2.1</delta.version>
-    
-    <!-- Версии для исправления конфликтов -->
     <jackson.version>2.15.2</jackson.version>
     <slf4j.version>2.0.9</slf4j.version>
     <log4j.version>2.20.0</log4j.version>
-    
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,7 +25,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- Форсируем версию Jackson -->
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
@@ -46,7 +42,6 @@
       <version>${scala.version}</version>
     </dependency>
 
-    <!-- Spark Core & SQL (без исключений, чтобы не сломать транзитивные зависимости) -->
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_${scala.binary.version}</artifactId>
@@ -58,23 +53,18 @@
       <version>${spark.version}</version>
     </dependency>
 
-    <!-- Delta Lake -->
     <dependency>
       <groupId>io.delta</groupId>
       <artifactId>delta-spark_${scala.binary.version}</artifactId>
       <version>${delta.version}</version>
     </dependency>
 
-    <!-- === ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ БИБЛИОТЕК === -->
-    
-    <!-- 1. Новый SLF4J API (нужен для LoggingEventBuilder) -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
 
-    <!-- 2. Новый Jackson (нужен для StreamReadConstraints) -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
@@ -96,7 +86,6 @@
       <version>${jackson.version}</version>
     </dependency>
 
-    <!-- 3. Log4j2 (нужен для работы Spark внутри Fat Jar) -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
@@ -107,14 +96,12 @@
       <artifactId>log4j-api</artifactId>
       <version>${log4j.version}</version>
     </dependency>
-    <!-- Мост SLF4J -> Log4j2 (теперь совместим со SLF4J 2.0) -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j2-impl</artifactId>
       <version>${log4j.version}</version>
     </dependency>
-    
-    <!-- Исключаем старый мост log4j-slf4j-impl (для SLF4J 1.7), если он вдруг придет транзитивно -->
+
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_${scala.binary.version}</artifactId>
@@ -180,4 +167,3 @@
     </plugins>
   </build>
 </project>
-
