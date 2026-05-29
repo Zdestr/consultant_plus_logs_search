@@ -133,7 +133,7 @@ object LogAnalysis {
       }
       if (!DeltaTable.isDeltaTable(spark, docOpensPath)) {
         spark.createDataFrame(sc.emptyRDD[Row], DocOpenSchema)
-          .write.format("delta").save(docOpensPath)
+          .write.format("delta").partitionBy("date").save(docOpensPath)
       }
 
       // Collect already-processed paths so we can skip them
@@ -169,7 +169,7 @@ object LogAnalysis {
             opens.map(o => Row(path, o.date, o.docId))
           },
           DocOpenSchema
-        ).write.format("delta").mode("append").partitionBy("date").save(docOpensPath)
+        ).write.format("delta").mode("append").save(docOpensPath)
 
         parsedRDD.unpersist()
       } else {

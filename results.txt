@@ -1,10 +1,42 @@
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 WARNING: sun.reflect.Reflection.getCallerClass is not supported. This will impact performance.
-SLF4J: Failed to load class "org.slf4j.impl.StaticMDCBinder".
-SLF4J: Defaulting to no-operation MDCAdapter implementation.
-SLF4J: See http://www.slf4j.org/codes.html#no_static_mdc_binder for further details.
+ERROR StatusLogger Unrecognized format specifier [d]
+ERROR StatusLogger Unrecognized conversion specifier [d] starting at position 16 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [thread]
+ERROR StatusLogger Unrecognized conversion specifier [thread] starting at position 25 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [level]
+ERROR StatusLogger Unrecognized conversion specifier [level] starting at position 35 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [logger]
+ERROR StatusLogger Unrecognized conversion specifier [logger] starting at position 47 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [msg]
+ERROR StatusLogger Unrecognized conversion specifier [msg] starting at position 54 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [n]
+ERROR StatusLogger Unrecognized conversion specifier [n] starting at position 56 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [d]
+ERROR StatusLogger Unrecognized conversion specifier [d] starting at position 16 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [thread]
+ERROR StatusLogger Unrecognized conversion specifier [thread] starting at position 25 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [level]
+ERROR StatusLogger Unrecognized conversion specifier [level] starting at position 35 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [logger]
+ERROR StatusLogger Unrecognized conversion specifier [logger] starting at position 47 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [msg]
+ERROR StatusLogger Unrecognized conversion specifier [msg] starting at position 54 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [n]
+ERROR StatusLogger Unrecognized conversion specifier [n] starting at position 56 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [d]
+ERROR StatusLogger Unrecognized conversion specifier [d] starting at position 16 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [thread]
+ERROR StatusLogger Unrecognized conversion specifier [thread] starting at position 25 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [level]
+ERROR StatusLogger Unrecognized conversion specifier [level] starting at position 35 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [logger]
+ERROR StatusLogger Unrecognized conversion specifier [logger] starting at position 47 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [msg]
+ERROR StatusLogger Unrecognized conversion specifier [msg] starting at position 54 in conversion pattern.
+ERROR StatusLogger Unrecognized format specifier [n]
+ERROR StatusLogger Unrecognized conversion specifier [n] starting at position 56 in conversion pattern.
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+%d [%thread] %-5level %logger - %msg%n%d [%thread] %-5level %logger - %msg%nProcessing 10000 new file(s)...
 
 ============================================================
 Metric 1 — Card searches that returned ACC_45616
