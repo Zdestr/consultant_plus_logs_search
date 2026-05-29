@@ -150,12 +150,14 @@ object LogAnalysis {
         println(f"  $date%-15s $docId%-20s $count")
       }
 
-      println()
-      println("=" * 60)
-      println("Metric 3 — Malformed (skipped) lines")
-      println("=" * 60)
-      println(s"  Count: $malformedLineCount")
-      println()
+      if (malformedLineCount > 0) {
+        println()
+        println("=" * 60)
+        println("Metric 3 — Malformed (skipped) lines")
+        println("=" * 60)
+        println(s"  Count: $malformedLineCount")
+        println()
+      }
     } finally {
       sc.stop()
     }
