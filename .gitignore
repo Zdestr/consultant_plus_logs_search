@@ -3,3 +3,4 @@ target/
 *.jar
 .DS_Store
 spark.log
+dependency-reduced-pom.xml

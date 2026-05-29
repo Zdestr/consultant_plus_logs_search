@@ -1,4 +1,10 @@
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 WARNING: sun.reflect.Reflection.getCallerClass is not supported. This will impact performance.
+SLF4J: Failed to load class "org.slf4j.impl.StaticMDCBinder".
+SLF4J: Defaulting to no-operation MDCAdapter implementation.
+SLF4J: See http://www.slf4j.org/codes.html#no_static_mdc_binder for further details.
 
 ============================================================
 Metric 1 — Card searches that returned ACC_45616
@@ -75526,4 +75532,3 @@ Metric 2 — Document openings per day (via quick search)
   26.12.2020      RLAW411_139072       1
   26.12.2020      RLAW411_147657       2
   26.12.2020      RLAW411_173686       1
-

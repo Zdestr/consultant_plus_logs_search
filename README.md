@@ -29,6 +29,7 @@ SESSION_END 01.07.2020_13:50:00
 
 - Scala 2.12
 - Apache Spark 3.5.3 (local mode)
+- Delta Lake 3.2.1 (LakeHouse-кеш результатов)
 - Apache Maven
 
 ## Сборка
@@ -55,8 +56,14 @@ java \
   --add-opens=java.base/sun.nio.cs=ALL-UNNAMED \
   --add-opens=java.base/sun.util.calendar=ALL-UNNAMED \
   -jar target/log-analysis-1.0-SNAPSHOT.jar \
-  /path/to/docs
+  /path/to/docs \
+  /path/to/delta
 ```
+
+- `/path/to/docs` — директория с файлами сессий
+- `/path/to/delta` — директория для Delta Lake-таблиц (создаётся автоматически при первом запуске)
+
+При повторном запуске уже обработанные файлы пропускаются; метрики вычисляются по кешированным данным в Delta-таблицах.
 
 > `--add-opens` требуется для Java 17+ из-за модульной системы
 
