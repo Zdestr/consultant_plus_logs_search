@@ -14,7 +14,13 @@ object LogAnalysis {
 
   private[consultantplus] case class QsDocOpen(date: String, docId: String)
 
-  private[consultantplus] def parseSession(content: String): (Int, Int, Seq[QsDocOpen]) = {
+  private[consultantplus] case class SessionResult(
+    cardSearchHits: Int,
+    malformedLines: Int,
+    qsDocOpens: Seq[QsDocOpen]
+  )
+
+  private[consultantplus] def parseSession(content: String): SessionResult = {
     val lines = content.linesIterator.map(_.trim).filter(_.nonEmpty).toArray
 
     var cardSearchHits  = 0
@@ -90,7 +96,7 @@ object LogAnalysis {
       }
     }
 
-    (cardSearchHits, malformedLines, qsDocOpens.toSeq)
+    SessionResult(cardSearchHits, malformedLines, qsDocOpens.toSeq)
   }
 
   private val SessionSchema = StructType(Seq(
@@ -148,23 +154,22 @@ object LogAnalysis {
 
         val parsedRDD = newFiles.map { case (path, content) =>
           try {
-            val (hits, malformed, opens) = parseSession(content)
-            (path, hits, malformed, opens)
+            (path, parseSession(content))
           } catch {
             case e: Exception =>
               System.err.println(s"[ERROR] Failed to parse $path: ${e.getMessage}")
-              (path, 0, 0, Seq.empty[QsDocOpen])
+              (path, SessionResult(0, 0, Seq.empty[QsDocOpen]))
           }
         }.cache()
 
         spark.createDataFrame(
-          parsedRDD.map { case (path, hits, malformed, _) => Row(path, hits, malformed) },
+          parsedRDD.map { case (path, r) => Row(path, r.cardSearchHits, r.malformedLines) },
           SessionSchema
         ).write.format("delta").mode("append").save(sessionsPath)
 
         spark.createDataFrame(
-          parsedRDD.flatMap { case (path, _, _, opens) =>
-            opens.map(o => Row(path, o.date, o.docId))
+          parsedRDD.flatMap { case (path, r) =>
+            r.qsDocOpens.map(o => Row(path, o.date, o.docId))
           },
           DocOpenSchema
         ).write.format("delta").mode("append").save(docOpensPath)
