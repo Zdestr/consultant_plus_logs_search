@@ -169,7 +169,7 @@ object LogAnalysis {
             opens.map(o => Row(path, o.date, o.docId))
           },
           DocOpenSchema
-        ).write.format("delta").mode("append").save(docOpensPath)
+        ).write.format("delta").mode("append").partitionBy("date").save(docOpensPath)
 
         parsedRDD.unpersist()
       } else {
