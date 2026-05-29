@@ -11,10 +11,11 @@ object LogAnalysis {
 
   private case class QsDocOpen(date: String, docId: String)
 
-  private def parseSession(content: String): (Int, Seq[QsDocOpen]) = {
+  private def parseSession(content: String): (Int, Int, Seq[QsDocOpen]) = {
     val lines = content.linesIterator.map(_.trim).filter(_.nonEmpty).toArray
 
     var cardSearchHits  = 0
+    var malformedLines  = 0
     val qsDocOpens      = scala.collection.mutable.ArrayBuffer[QsDocOpen]()
     val searchIndex     = scala.collection.mutable.Map.empty[String, (String, String)]
 
@@ -27,6 +28,7 @@ object LogAnalysis {
       val tokens = line.split("\\s+")
       if (tokens.isEmpty) {
         System.err.println(s"[WARN] Skipping unexpectedly empty token array for line: '$line'")
+        malformedLines += 1
       } else {
         val tag = tokens(0)
 
@@ -53,6 +55,7 @@ object LogAnalysis {
               case 3 => (sessionDate,            tokens(1), tokens(2))
               case _ =>
                 System.err.println(s"[WARN] Malformed DOC_OPEN line (${tokens.length} tokens): '$line'")
+                malformedLines += 1
                 ("", "", "")
             }
             if (searchId.nonEmpty && docId.nonEmpty) {
@@ -84,7 +87,7 @@ object LogAnalysis {
       }
     }
 
-    (cardSearchHits, qsDocOpens.toSeq)
+    (cardSearchHits, malformedLines, qsDocOpens.toSeq)
   }
 
   def main(args: Array[String]): Unit = {
@@ -107,14 +110,15 @@ object LogAnalysis {
         catch {
           case e: Exception =>
             System.err.println(s"[ERROR] Failed to parse session file $path: ${e.getMessage}")
-            (0, Seq.empty[QsDocOpen])
+            (0, 0, Seq.empty[QsDocOpen])
         }
       }.cache()
 
-      val cardSearchCount: Long = parsedRDD.map(_._1.toLong).sum().toLong
+      val cardSearchCount: Long  = parsedRDD.map(_._1.toLong).sum().toLong
+      val malformedLineCount: Long = parsedRDD.map(_._2.toLong).sum().toLong
 
       val docOpensByDay = parsedRDD
-        .flatMap(_._2)
+        .flatMap(_._3)
         .map(e => ((e.date, e.docId), 1L))
         .reduceByKey(_ + _)
         .map { case ((date, docId), count) => (date, docId, count) }
@@ -145,6 +149,12 @@ object LogAnalysis {
       docOpensByDay.foreach { case (date, docId, count) =>
         println(f"  $date%-15s $docId%-20s $count")
       }
+
+      println()
+      println("=" * 60)
+      println("Metric 3 — Malformed (skipped) lines")
+      println("=" * 60)
+      println(s"  Count: $malformedLineCount")
       println()
     } finally {
       sc.stop()
