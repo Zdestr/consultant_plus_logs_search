@@ -12,9 +12,9 @@ object LogAnalysis {
   private def extractDate(datetime: String): String =
     datetime.split("_").headOption.getOrElse(datetime)
 
-  private case class QsDocOpen(date: String, docId: String)
+  private[consultantplus] case class QsDocOpen(date: String, docId: String)
 
-  private def parseSession(content: String): (Int, Int, Seq[QsDocOpen]) = {
+  private[consultantplus] def parseSession(content: String): (Int, Int, Seq[QsDocOpen]) = {
     val lines = content.linesIterator.map(_.trim).filter(_.nonEmpty).toArray
 
     var cardSearchHits  = 0
