@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: spark-job-runner
+  namespace: consultant-plus
+spec:
+  templates:
+  - name: run
+    inputs:
+      parameters:
+      - name: image
+      - name: command
+      - name: logs-path
+      - name: delta-path
+      - name: target-date
+        value: ""
+      - name: executor-count
+        value: "4"
+      - name: executor-memory
+        value: "4g"
+    outputs:
+      parameters:
+      - name: job-name
+        valueFrom:
+          jsonPath: '{"$.metadata.name"}'
+    resource:
+      action: create
+      successCondition: status.applicationState.state == COMPLETED
+      failureCondition: status.applicationState.state == FAILED
+      manifest: |
+        apiVersion: sparkoperator.k8s.io/v1beta2
+        kind: SparkApplication
+        metadata:
+          generateName: cp-spark-
+          namespace: consultant-plus
+        spec:
+          type: Scala
+          mode: cluster
+          image: "{{inputs.parameters.image}}"
+          mainClass: com.consultantplus.Main
+          arguments:
+          - "{{inputs.parameters.command}}"
+          - "{{inputs.parameters.logs-path}}"
+          - "{{inputs.parameters.delta-path}}"
+          - "{{inputs.parameters.target-date}}"
+          sparkVersion: "3.5.3"
+          driver:
+            cores: 1
+            memory: "2g"
+            serviceAccount: spark
+          executor:
+            cores: 2
+            instances: "{{inputs.parameters.executor-count}}"
+            memory: "{{inputs.parameters.executor-memory}}"
+          sparkConf:
+            spark.sql.extensions: io.delta.sql.DeltaSparkSessionExtension
+            spark.sql.catalog.spark_catalog: org.apache.spark.sql.delta.catalog.DeltaCatalog
+            spark.hadoop.fs.s3a.endpoint: http://minio:9000
+            spark.hadoop.fs.s3a.access.key: minio
+            spark.hadoop.fs.s3a.secret.key: minio123
+          env:
+          - name: PUSHGATEWAY_URL
+            valueFrom:
+              secretKeyRef:
+                name: monitoring-secrets
+                key: pushgateway-url

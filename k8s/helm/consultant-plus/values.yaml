@@ -1,0 +1,40 @@
+image:
+  repository: registry.internal/consultant-plus/cp-pipeline
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+spark:
+  master: "k8s://https://kubernetes.default.svc"
+  driver:
+    cores: 1
+    memory: "2g"
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+  executor:
+    cores: 2
+    instances: 4
+    memory: "4g"
+    resources:
+      requests:
+        cpu: "2000m"
+        memory: "4Gi"
+      limits:
+        cpu: "4000m"
+        memory: "4Gi"
+
+minio:
+  endpoint: "http://minio:9000"
+  bucket: "cp-delta"
+
+kafka:
+  bootstrapServers: "kafka:9092"
+  topic: "raw-session-logs"
+  groupId: "cp-ingest"
+
+monitoring:
+  pushgatewayUrl: "http://prometheus-pushgateway:9091"

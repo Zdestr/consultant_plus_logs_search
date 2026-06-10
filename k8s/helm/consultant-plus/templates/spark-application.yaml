@@ -1,0 +1,38 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: {{ include "consultant-plus.fullname" . }}-ingest
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: Scala
+  mode: cluster
+  image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  mainClass: com.consultantplus.Main
+  arguments:
+  - all
+  - "s3a://{{ .Values.minio.bucket }}/logs/"
+  - "s3a://{{ .Values.minio.bucket }}/delta/"
+  sparkVersion: "3.5.3"
+  driver:
+    cores: {{ .Values.spark.driver.cores }}
+    memory: {{ .Values.spark.driver.memory | quote }}
+    serviceAccount: spark
+    resources:
+      {{- toYaml .Values.spark.driver.resources | nindent 6 }}
+  executor:
+    cores: {{ .Values.spark.executor.cores }}
+    instances: {{ .Values.spark.executor.instances }}
+    memory: {{ .Values.spark.executor.memory | quote }}
+    resources:
+      {{- toYaml .Values.spark.executor.resources | nindent 6 }}
+  sparkConf:
+    spark.sql.extensions: io.delta.sql.DeltaSparkSessionExtension
+    spark.sql.catalog.spark_catalog: org.apache.spark.sql.delta.catalog.DeltaCatalog
+    spark.hadoop.fs.s3a.endpoint: {{ .Values.minio.endpoint }}
+    spark.hadoop.fs.s3a.path.style.access: "true"
+  env:
+  - name: PUSHGATEWAY_URL
+    value: {{ .Values.monitoring.pushgatewayUrl }}
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    value: {{ .Values.kafka.bootstrapServers }}

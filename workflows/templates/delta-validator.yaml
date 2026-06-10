@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: delta-validator
+  namespace: consultant-plus
+spec:
+  templates:
+  - name: validate
+    inputs:
+      parameters:
+      - name: delta-path
+      - name: table
+      - name: min-rows
+        value: "1000"
+    outputs:
+      parameters:
+      - name: row-count
+        valueFrom:
+          path: /tmp/row_count.txt
+    container:
+      image: apache/spark:3.5.3
+      command: [bash, -c]
+      args:
+      - |
+        spark-submit --class com.consultantplus.Validator \
+          /app/cp-pipeline.jar \
+          {{inputs.parameters.delta-path}}/{{inputs.parameters.table}} \
+          {{inputs.parameters.min-rows}} \
+          /tmp/row_count.txt
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1000m"
+          memory: "1Gi"
+      env:
+      - name: AWS_ENDPOINT_URL
+        value: "http://minio:9000"

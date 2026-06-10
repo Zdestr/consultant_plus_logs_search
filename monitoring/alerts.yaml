@@ -1,0 +1,45 @@
+groups:
+- name: consultant-plus-pipeline
+
+  rules:
+
+  - alert: IngestJobNotRunning
+    expr: time() - cp_pipeline_last_ingest_timestamp > 86400
+    for: 30m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Ingest job did not run in the last 24 hours"
+      description: "cp_pipeline_last_ingest_timestamp is stale. Check Argo Workflow for failures."
+
+  - alert: HighMalformedLineRate
+    expr: |
+      cp_pipeline_malformed_lines / cp_pipeline_files_total > 0.05
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "More than 5% of log lines are malformed"
+      description: "Possible format change in source logs. Review SessionParser."
+
+  - alert: DeltaTableWriteErrors
+    expr: |
+      increase(cp_pipeline_delta_write_errors_total[10m]) > 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Delta Lake write errors detected"
+      description: "MERGE INTO or write failed. Check concurrent writers or schema mismatch."
+
+  - alert: KafkaConsumerLagHigh
+    expr: |
+      sum by (topic) (kafka_consumer_group_lag{group="cp-ingest"}) > 10000
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Kafka lag for cp-ingest > 10k messages"
+      description: >
+        Ingest Spark job is falling behind. Possible causes: executor OOM,
+        slow parsing, insufficient executor count.

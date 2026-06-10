@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: cp-daily-pipeline-
+  namespace: consultant-plus
+spec:
+  entrypoint: pipeline
+  arguments:
+    parameters:
+    - name: date
+      value: "2020-01-15"
+    - name: spark-image
+      value: "registry.internal/consultant-plus/cp-pipeline:1.0.0"
+    - name: logs-path
+      value: "s3://cp-logs/sessions/"
+    - name: delta-path
+      value: "s3://cp-delta/"
+
+  templates:
+  - name: pipeline
+    dag:
+      tasks:
+
+      - name: ingest
+        templateRef:
+          name: spark-job-runner
+          template: run
+        arguments:
+          parameters:
+          - name: image
+            value: "{{workflow.parameters.spark-image}}"
+          - name: command
+            value: ingest
+          - name: logs-path
+            value: "{{workflow.parameters.logs-path}}"
+          - name: delta-path
+            value: "{{workflow.parameters.delta-path}}"
+
+      - name: validate-raw
+        dependencies: [ingest]
+        templateRef:
+          name: delta-validator
+          template: validate
+        arguments:
+          parameters:
+          - name: delta-path
+            value: "{{workflow.parameters.delta-path}}"
+          - name: table
+            value: raw/sessions
+
+      - name: process
+        dependencies: [validate-raw]
+        templateRef:
+          name: spark-job-runner
+          template: run
+        arguments:
+          parameters:
+          - name: image
+            value: "{{workflow.parameters.spark-image}}"
+          - name: command
+            value: process
+          - name: logs-path
+            value: "{{workflow.parameters.logs-path}}"
+          - name: delta-path
+            value: "{{workflow.parameters.delta-path}}"
+          - name: target-date
+            value: "{{workflow.parameters.date}}"
+
+      - name: aggregate
+        dependencies: [process]
+        templateRef:
+          name: spark-job-runner
+          template: run
+        arguments:
+          parameters:
+          - name: image
+            value: "{{workflow.parameters.spark-image}}"
+          - name: command
+            value: aggregate
+          - name: logs-path
+            value: "{{workflow.parameters.logs-path}}"
+          - name: delta-path
+            value: "{{workflow.parameters.delta-path}}"
+
+      - name: push-metrics
+        dependencies: [aggregate]
+        templateRef:
+          name: spark-job-runner
+          template: run
+        arguments:
+          parameters:
+          - name: image
+            value: "{{workflow.parameters.spark-image}}"
+          - name: command
+            value: metrics
+          - name: logs-path
+            value: "{{workflow.parameters.logs-path}}"
+          - name: delta-path
+            value: "{{workflow.parameters.delta-path}}"
