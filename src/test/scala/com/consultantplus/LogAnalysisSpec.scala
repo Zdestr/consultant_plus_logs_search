@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 
 class LogAnalysisSpec extends AnyFlatSpec with Matchers {
 
-  private def parse(content: String) = LogAnalysis.parseSession(content)
+  private def parse(content: String) = SessionParser.parse(content)
 
   "parseSession" should "return zeros and empty opens for an empty session" in {
     val r = parse("")
@@ -26,7 +26,7 @@ class LogAnalysisSpec extends AnyFlatSpec with Matchers {
     r.cardSearchHits shouldBe 0
     r.malformedLines shouldBe 0
     r.qsDocOpens     should have size 1
-    r.qsDocOpens.head shouldBe LogAnalysis.QsDocOpen("01.07.2020", "ACC_45616")
+    r.qsDocOpens.head shouldBe SessionParser.QsDocOpen("01.07.2020", "ACC_45616")
   }
 
   it should "count multiple QS doc opens across different searches" in {
