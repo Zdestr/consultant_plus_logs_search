@@ -3,12 +3,12 @@ kind: Kustomization
 
 namespace: consultant-plus-staging
 
-bases:
-  - ../../helm/consultant-plus
 
 patches:
-  - path: executor-patch.yaml
+- path: executor-patch.yaml
 
 images:
-  - name: ghcr.io/zdestr/cp-pipeline
-    newTag: latest
+- name: ghcr.io/zdestr/cp-pipeline
+  newTag: 4b1ad81e
+resources:
+- ../../helm/consultant-plus
