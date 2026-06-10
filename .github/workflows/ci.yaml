@@ -25,6 +25,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      packages: write
     outputs:
       image-tag: ${{ steps.meta.outputs.tag }}
 
