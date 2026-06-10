@@ -7,5 +7,5 @@ bases:
   - ../../helm/consultant-plus
 
 images:
-  - name: registry.internal/consultant-plus/cp-pipeline
+  - name: ghcr.io/zdestr/cp-pipeline
     newTag: 1.0.0

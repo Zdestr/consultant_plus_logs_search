@@ -1,0 +1,7 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: consultant-plus-ingest
+spec:
+  executor:
+    instances: 2
