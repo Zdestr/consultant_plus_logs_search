@@ -1,0 +1,8 @@
+src/
+target/
+!target/cp-pipeline-1.0.0.jar
+.github/
+k8s/
+monitoring/
+workflows/
+*.md
