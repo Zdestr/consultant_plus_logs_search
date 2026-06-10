@@ -38,8 +38,8 @@ object ProcessSessions {
     DeltaTable.forPath(spark, processedOpensPath).as("t")
       .merge(aggregated.as("u"),
         "t.date = u.date AND t.doc_id = u.doc_id")
-      .whenMatchedUpdate(set = Map("opens" -> col("u.opens")))
-      .whenNotMatchedInsertAll()
+      .whenMatched().update(Map("opens" -> col("u.opens")))
+      .whenNotMatched().insertAll()
       .execute()
 
     println(s"[ProcessSessions] Done for date=${targetDate.getOrElse("all")}.")

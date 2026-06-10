@@ -53,8 +53,8 @@ object AggregateMetrics {
       DeltaTable.forPath(spark, analyticsPath).as("t")
         .merge(enriched.as("u"),
           "t.date = u.date AND t.doc_id = u.doc_id")
-        .whenMatchedUpdateAll()
-        .whenNotMatchedInsertAll()
+        .whenMatched().updateAll()
+        .whenNotMatched().insertAll()
         .execute()
     }
 

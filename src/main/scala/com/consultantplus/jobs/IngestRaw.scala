@@ -74,13 +74,13 @@ object IngestRaw {
 
     DeltaTable.forPath(spark, rawSessionsPath).as("t")
       .merge(sessionsDf.as("s"), "t.file_path = s.file_path")
-      .whenNotMatchedInsertAll()
+      .whenNotMatched().insertAll()
       .execute()
 
     DeltaTable.forPath(spark, rawDocOpensPath).as("t")
       .merge(docOpensDf.as("s"),
         "t.file_path = s.file_path AND t.doc_id = s.doc_id")
-      .whenNotMatchedInsertAll()
+      .whenNotMatched().insertAll()
       .execute()
 
     parsedRDD.unpersist()
