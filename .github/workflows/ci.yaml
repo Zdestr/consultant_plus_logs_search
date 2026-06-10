@@ -44,20 +44,26 @@ jobs:
       id: meta
       run: echo "tag=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
 
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Build and push Docker image
       run: |
-        IMAGE=registry.internal/consultant-plus/cp-pipeline
+        IMAGE=ghcr.io/${{ github.repository_owner }}/cp-pipeline
         TAG=${{ steps.meta.outputs.tag }}
-        docker build -t $IMAGE:$TAG .
+        docker build -t $IMAGE:$TAG -t $IMAGE:latest .
         docker push $IMAGE:$TAG
-        docker tag $IMAGE:$TAG $IMAGE:latest
         docker push $IMAGE:latest
 
     - name: Update staging overlay
       run: |
         cd k8s/overlays/staging
         kustomize edit set image \
-          registry.internal/consultant-plus/cp-pipeline:${{ steps.meta.outputs.tag }}
+          ghcr.io/${{ github.repository_owner }}/cp-pipeline:${{ steps.meta.outputs.tag }}
         git config user.email "ci@internal"
         git config user.name "CI"
         git commit -am "ci: update cp-pipeline to ${{ steps.meta.outputs.tag }}"
